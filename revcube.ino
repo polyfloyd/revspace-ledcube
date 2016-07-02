@@ -3,6 +3,7 @@
 
 #define NUM_BUFFERS 2
 
+#define MAX(a, b) (a > b ? a : b)
 #define PORT_HI(port, bit) (port |= bit)
 #define PORT_LO(port, bit) (port &= ~bit)
 
@@ -41,7 +42,7 @@ void setup() {
     }
 
     for (uint16_t i = 0; i < 256; i++) {
-        grayscaleTable[255 - i] = i * 16;
+        grayscaleTable[255 - i] = uint16_t(MAX((log(i / 255.0) + 4.0) * 1024.0 - 1, 0));
     }
 }
 
