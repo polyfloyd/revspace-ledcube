@@ -19,3 +19,9 @@ void map2D(uint8_t *frame, uint8_t (*func)(uint8_t, uint8_t)) {
         }
     }
 }
+
+void setAll(uint8_t *frame, uint8_t value) {
+    for (int i = 0; i < 512; i++) {
+        frame[i] = value;
+    }
+}

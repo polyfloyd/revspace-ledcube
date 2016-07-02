@@ -48,9 +48,7 @@ void setup() {
 
 void loop() {
     draw([](uint8_t *frame) {
-        map3D((uint8_t*)frame, [](uint8_t x, uint8_t y, uint8_t z) {
-            return uint8_t((millis() / 10) % 256);
-        });
+        setAll(frame, sin(millis() / 300.0) * 127 + 127);
     });
 }
 
