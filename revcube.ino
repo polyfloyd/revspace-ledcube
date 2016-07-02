@@ -1,12 +1,15 @@
 #define NUM_TLCS 4
 #include "Tlc5940.h"
 
+#define NUM_BUFFERS 2
+
 #define PORT_HI(port, bit) (port |= bit)
 #define PORT_LO(port, bit) (port &= ~bit)
 
 #include "frame.h"
 
 volatile void refreshCallback();
+void draw(void (*func)(uint8_t*));
 
 struct {
     uint8_t bit;
@@ -25,8 +28,10 @@ struct {
 
 static uint16_t grayscaleTable[255];
 
-volatile static uint8_t frame[512];
-volatile static uint8_t *shownFrame = frame;
+volatile static uint8_t currentBufferIndex = 0;
+volatile static uint8_t buffer[512 * NUM_BUFFERS] = { 0 };
+volatile static uint8_t *shownFrame = &buffer[currentBufferIndex * 512];
+volatile static uint8_t *newFrame = 0;
 
 void setup() {
     Tlc.init();
@@ -41,9 +46,18 @@ void setup() {
 }
 
 void loop() {
-    map3D((uint8_t*)frame, [](uint8_t x, uint8_t y, uint8_t z) {
-        return uint8_t((millis() / 10) % 256);
+    draw([](uint8_t *frame) {
+        map3D((uint8_t*)frame, [](uint8_t x, uint8_t y, uint8_t z) {
+            return uint8_t((millis() / 10) % 256);
+        });
     });
+}
+
+void draw(void (*func)(uint8_t*)) {
+    currentBufferIndex = (currentBufferIndex + 1) % NUM_BUFFERS;
+    volatile uint8_t *buf = &buffer[currentBufferIndex * 512];
+    func((uint8_t*)buf);
+    newFrame = buf;
 }
 
 volatile void refreshCallback() {
@@ -51,6 +65,10 @@ volatile void refreshCallback() {
 
     PORT_LO(*zPins[shownZ].port, zPins[shownZ].bit);
     shownZ = (shownZ + 1) % 8;
+    if (!shownZ && newFrame) {
+        shownFrame = newFrame;
+        newFrame = 0;
+    }
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
             Tlc.set(y * 8 + x, grayscaleTable[shownFrame[FR_IDX(x, y, shownZ)]]);
