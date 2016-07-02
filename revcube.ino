@@ -23,7 +23,7 @@ struct {
     { 1<<6,  &DDRD, &PORTD }, // Pin 6
     { 1<<7,  &DDRD, &PORTD }, // Pin 7
     { 1<<0,  &DDRB, &PORTB }, // Pin 8
-    { 1<<4,  &DDRB, &PORTB }, // Pin 12
+    { 1<<2,  &DDRC, &PORTC }, // Pin A2
     { 1<<1,  &DDRC, &PORTC }, // Pin A1
 };
 
