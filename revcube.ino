@@ -29,7 +29,7 @@ struct {
     { 1<<1,  &DDRC, &PORTC }, // Pin A1
 };
 
-// This table maps the frame's grayscale values (0 <= v < 4096) to the value
+// This table maps the frame's grayscale values (0 <= v < 256) to the value
 // that the TLCs (0 <= v < 4096). An inversion is applied to match the pullup
 // resistors and a logarithm is used to make the frame grayscale more linear in
 // light output.
