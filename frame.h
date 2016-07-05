@@ -1,3 +1,6 @@
+#ifndef _FRAME_H
+#define _FRAME_H
+
 #include "stdint.h"
 
 // Calculates the absolute index in a frame from an XYZ-coordinate.
@@ -13,3 +16,5 @@ void map2D(uint8_t *frame, uint8_t (*func)(uint8_t, uint8_t));
 
 // Sets all LEDs in the frame to the same value.
 void setAll(uint8_t *frame, uint8_t value);
+
+#endif

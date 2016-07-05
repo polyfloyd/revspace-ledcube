@@ -1,7 +1,9 @@
 #define NUM_BUFFERS 2
+#define DRAW_INTERVAL 20
 
 #define MAX(a, b) (a > b ? a : b)
 
+#include "animations.h"
 #include "frame.h"
 // You should include https://github.com/PaulStoffregen/Tlc5940 in your Arduino
 // libraries and set NUM_TLCS to 4 in tlc_config.h.
@@ -9,6 +11,7 @@
 
 volatile void refreshCallback();
 void draw(void (*func)(uint8_t*));
+void drawFor(unsigned long duratonMillis, void (*func)(uint8_t*));
 
 // This list contains the pin mapping for the Z-axis. Ports are rawly
 // manipulated for more speed!
@@ -50,9 +53,9 @@ void setup() {
 }
 
 void loop() {
-    draw([](uint8_t *frame) {
-        setAll(frame, sin(millis() / 300.0) * 127 + 127);
-    });
+    drawFor(2000, animSmoothFade);
+    drawFor(2000, animSteps);
+    drawFor(2000, animWave);
 }
 
 // This function can be used to draw using a double buffer and automaticaly
@@ -62,10 +65,25 @@ void draw(void (*func)(uint8_t*)) {
     // Cycle to the next buffer and get a pointer to the beginning of it.
     currentBufferIndex = (currentBufferIndex + 1) % NUM_BUFFERS;
     volatile uint8_t *buf = &buffer[currentBufferIndex * 512];
+
+    unsigned long begin = millis();
     // Apply the draw function.
     func((uint8_t*)buf);
     // Make the frame available to the refresh callback.
     newFrame = buf;
+    // Give the display time to swap. The animation looks nicer that way.
+    unsigned long end = millis();
+    if (end - begin < DRAW_INTERVAL) {
+        delay(DRAW_INTERVAL - (end - begin));
+    }
+}
+
+// Repeatedly draws using the specified function for the specified duration.
+void drawFor(unsigned long duratonMillis, void (*func)(uint8_t*)) {
+    unsigned long until = millis() + duratonMillis;
+    while (millis() <= until) {
+        draw(func);
+    }
 }
 
 // This function is run every time a TLC grayscale cycle has been completed.
