@@ -1,8 +1,6 @@
 #define NUM_BUFFERS 2
 
 #define MAX(a, b) (a > b ? a : b)
-#define PORT_HI(port, bit) (port |= bit)
-#define PORT_LO(port, bit) (port &= ~bit)
 
 #include "frame.h"
 // You should include https://github.com/PaulStoffregen/Tlc5940 in your Arduino
@@ -76,7 +74,7 @@ volatile void refreshCallback() {
     volatile static uint8_t *shownFrame = &buffer[currentBufferIndex * 512];
 
     // Turn off the previous level.
-    PORT_LO(*zPins[shownZ].port, zPins[shownZ].bit);
+    *zPins[shownZ].port &= ~zPins[shownZ].bit;
     // Cycle to the next level.
     shownZ = (shownZ + 1) % 8;
     // If a frame has been completed and a new frame is available, set it as
@@ -93,5 +91,5 @@ volatile void refreshCallback() {
     }
     Tlc.update();
     // Turn on the level to display the current level.
-    PORT_HI(*zPins[shownZ].port, zPins[shownZ].bit);
+    *zPins[shownZ].port |= zPins[shownZ].bit;
 }
