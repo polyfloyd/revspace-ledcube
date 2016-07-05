@@ -1,6 +1,3 @@
-#define NUM_TLCS 4
-#include "Tlc5940.h"
-
 #define NUM_BUFFERS 2
 
 #define MAX(a, b) (a > b ? a : b)
@@ -8,6 +5,9 @@
 #define PORT_LO(port, bit) (port &= ~bit)
 
 #include "frame.h"
+// You should include https://github.com/PaulStoffregen/Tlc5940 in your Arduino
+// libraries and set NUM_TLCS to 4 in tlc_config.h.
+#include "Tlc5940.h"
 
 volatile void refreshCallback();
 void draw(void (*func)(uint8_t*));
